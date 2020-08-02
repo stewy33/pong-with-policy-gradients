@@ -6,6 +6,7 @@ Modified from https://gist.github.com/karpathy/a4166c7fe253700972fcbc77e4ea32c5
 
 import argparse
 import datetime as datetime
+import math
 import os
 import random
 import time
@@ -50,7 +51,8 @@ def calc_discounted_future_rewards(rewards, discount_factor):
         if rewards[t] != 0:
             discounted_future_reward = 0
 
-        ### TODO: calculated discounted_future_reward at each timestep
+        discounted_future_reward = rewards[t] + discount_factor * discounted_future_reward
+        discounted_future_rewards[t] = discounted_future_reward
 
     return discounted_future_rewards
 
@@ -61,13 +63,15 @@ class PolicyNetwork(nn.Module):
     def __init__(self, input_size, hidden_size):
         super().__init__()
 
-        ### TODO: Define a two-layer MLP with input size `input_size`
-        ###       and hidden layer size of `hidden_size` that outputs
-        ###       the probability of going up for a given game state.
+        self.fc1 = nn.Linear(input_size, hidden_size)
+        self.fc2 = nn.Linear(hidden_size, 1)
 
     def forward(self, x):
+        x = self.fc1(x)
+        x = nn.functional.relu(x)
 
-        ### TODO: Define the forward method as well
+        x = self.fc2(x)
+        prob_up = torch.sigmoid(x)
 
         return prob_up
 
@@ -101,9 +105,9 @@ def run_episode(model, env, discount_factor, render=False):
         prob_up = model(x)
         action = UP if random.random() < prob_up else DOWN # roll the dice!
 
-        ### TODO: Calculate the log probability of sampling the action that ended up
-        ###       being chosen: log(P(prob_up | action = UP)), log(P(prob_down | action = DOWN))
-        ###       and append to `action_chosen_log_probs`.
+        # Calculate the probability of sampling the action that was chosen
+        action_chosen_prob = prob_up if action == UP else (1 - prob_up)
+        action_chosen_log_probs.append(torch.log(action_chosen_prob))
 
         # Step the environment, get new measurements, and updated discounted_reward
         observation, reward, done, info = env.step(action)
@@ -118,15 +122,14 @@ def run_episode(model, env, discount_factor, render=False):
     discounted_future_rewards = calc_discounted_future_rewards(rewards, discount_factor)
 
     # Standardize the rewards to have mean 0, std. deviation 1 (helps control the gradient estimator variance).
-    # It causes roughly half of the actions to be encouraged and half to be discouraged, which
-    # is helpful especially in beginning when +1 reward signals are rare.
+    # It encourages roughly half of the actions to be rewarded and half to be discouraged, which
+    # is helpful especially in beginning when positive reward signals are rare.
     discounted_future_rewards = (discounted_future_rewards - discounted_future_rewards.mean()) \
                                      / discounted_future_rewards.std()
 
     # PG magic happens right here, multiplying action_chosen_log_prob by future reward.
     # Negate since the optimizer does gradient descent (instead of gradient ascent)
-
-    ### TODO: Calculate the loss that the optimizer will optimize the weights with respect to
+    loss = -(discounted_future_rewards * action_chosen_log_probs).sum()
 
     return loss, rewards.sum()
 
@@ -160,11 +163,6 @@ def train(render=False):
     tf_writer.set_as_default()
 
     # Create pong environment (PongDeterministic versions run faster)
-    # Episodes consist of 20 games where a game ending in a win yields +1 reward
-    # and a game ending in a loss give -1 reward.
-    #
-    # The RL agent (green paddle) plays against a simple AI (tan paddle) that
-    # just tries to track the y-coordinate of the ball.
     env = gym.make("PongDeterministic-v4")
 
     # Pick up at the batch number we left off at to make tensorboard plots nicer
