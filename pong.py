@@ -4,6 +4,7 @@ Modified from https://gist.github.com/karpathy/a4166c7fe253700972fcbc77e4ea32c5
 
 """
 
+import argparse
 import datetime as datetime
 import math
 import os
@@ -82,8 +83,8 @@ def run_episode(model, env, discount_factor, render=False):
     observation = env.reset()
     prev_x = preprocess(observation)
 
-    episode_action_chosen_probs = []
-    episode_rewards = []
+    action_chosen_log_probs = []
+    rewards = []
 
     done = False
     timestep = 0
@@ -101,46 +102,47 @@ def run_episode(model, env, discount_factor, render=False):
         prev_x = cur_x
 
         # Run the policy network and sample action from the returned probability
-        x = torch.Tensor(x)
         prob_up = model(x)
         action = UP if random.random() < prob_up else DOWN # roll the dice!
 
-        # Calculate prob of sampling the action that was chosen
+        # Calculate the probability of sampling the action that was chosen
         action_chosen_prob = prob_up if action == UP else (1 - prob_up)
-        episode_action_chosen_probs.append(action_chosen_prob) 
+        action_chosen_log_probs.append(torch.log(action_chosen_prob))
 
         # Step the environment, get new measurements, and updated discounted_reward
         observation, reward, done, info = env.step(action)
-        episode_rewards.append(torch.Tensor([reward]))
+        rewards.append(torch.Tensor([reward]))
         timestep += 1
 
-    # Concat lists of log probs and rewards
-    episode_action_chosen_probs = torch.cat(episode_action_chosen_probs)
-    episode_rewards = torch.cat(episode_rewards)
+    # Concat lists of log probs and rewards into 1-D tensors
+    action_chosen_log_probs = torch.cat(action_chosen_log_probs)
+    rewards = torch.cat(rewards)
 
     # Calculate the discounted future reward at each timestep
-    discounted_future_rewards = calc_discounted_future_rewards(episode_rewards, discount_factor)
+    discounted_future_rewards = calc_discounted_future_rewards(rewards, discount_factor)
 
-    # Standardize the rewards to have mean 0, std. deviation 1 (helps control the gradient estimator variance)
+    # Standardize the rewards to have mean 0, std. deviation 1 (helps control the gradient estimator variance).
+    # It encourages roughly half of the actions to be rewarded and half to be discouraged, which
+    # is helpful especially in beginning when positive reward signals are rare.
     discounted_future_rewards = (discounted_future_rewards - discounted_future_rewards.mean()) \
                                      / discounted_future_rewards.std()
 
-    # PG magic happens right here, multiplying action_chosen_prob by future reward.
-    # Negate since optimizer does gradient descent, so negative reward needs to give positive loss
-    loss = -(discounted_future_rewards * episode_action_chosen_probs).sum()
+    # PG magic happens right here, multiplying action_chosen_log_prob by future reward.
+    # Negate since the optimizer does gradient descent (instead of gradient ascent)
+    loss = -(discounted_future_rewards * action_chosen_log_probs).sum()
 
-    return loss, episode_rewards.sum()
+    return loss, rewards.sum()
 
 
 def train(render=False):
     # Hyperparameters
     input_size = 80 * 80 # input dimensionality: 80x80 grid
     hidden_size = 200 # number of hidden layer neurons
-    learning_rate = 3e-4
+    learning_rate = 1e-4
     discount_factor = 0.99 # discount factor for reward
 
     batch_size = 4
-    save_every_episodes = 25
+    save_every_batches = 5
 
     # Load model from checkpoint if exists, otherwise, initialize new model
     if os.path.exists('policy_network.pth'):
@@ -160,8 +162,8 @@ def train(render=False):
     tf_writer = tf.summary.create_file_writer(f'tensorboard_logs/{start_time}')
     tf_writer.set_as_default()
 
-    # Create pong environment
-    env = gym.make("Pong-v0")
+    # Create pong environment (PongDeterministic versions run faster)
+    env = gym.make("PongDeterministic-v4")
 
     # Pick up at the batch number we left off at to make tensorboard plots nicer
     batch = last_batch + 1
@@ -179,35 +181,36 @@ def train(render=False):
             # Boring book-keeping
             print(f'Episode reward total was {episode_reward}')
 
-            # Save every `save_every_episodes`
-            episode = batch * batch_size + batch_episode
-            if episode % save_every_episodes == 0:
-                print('Saving checkpoint...')
-                save_dict = {
-                    'model': model,
-                    'optimizer': optimizer,
-                    'start_time': start_time,
-                    'last_batch': batch
-                }
-                torch.save(save_dict, 'policy_network.pth')
-
         # Backprop after `batch_size` episodes
         optimizer.zero_grad()
         mean_batch_loss.backward()
         optimizer.step()
 
         # Batch metrics and tensorboard logging
-        print(f'Batch: {batch}, mean loss: {mean_batch_loss}, mean reward: {mean_batch_reward}')
+        print(f'Batch: {batch}, mean loss: {mean_batch_loss:.2f}, mean reward: {mean_batch_reward:.2f}')
         tf.summary.scalar('mean loss', mean_batch_loss.detach().item(), step=batch)
         tf.summary.scalar('mean reward', mean_batch_reward.detach().item(), step=batch)
+
+        if batch % save_every_batches == 0:
+            print('Saving checkpoint...')
+            save_dict = {
+                'model': model,
+                'optimizer': optimizer,
+                'start_time': start_time,
+                'last_batch': batch
+            }
+            torch.save(save_dict, 'policy_network.pth')
 
         batch += 1
 
 
 def main():
-    render = False
+    # By default, doesn't render game screen, but can invoke with `--render` flag on CLI
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--render', action='store_true')
+    args = parser.parse_args()
 
-    train(render)
+    train(render=args.render)
 
 
 if __name__ == '__main__':
