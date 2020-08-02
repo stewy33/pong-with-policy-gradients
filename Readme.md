@@ -1,6 +1,6 @@
 # Pong with Policy Gradients 🔨👷 
 
-A workshop to train a simple reinforcement learning agent to play pong using vanilla policy gradients 💯 
+Code for a workshop where you'll learn to train a simple reinforcement learning agent to play pong using vanilla policy gradients 💯 
 
 Adapted from [http://karpathy.github.io/2016/05/31/rl/](http://karpathy.github.io/2016/05/31/rl/) and rewritten with PyTorch (CNN policy network incoming!!)
 
