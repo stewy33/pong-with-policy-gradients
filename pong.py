@@ -99,11 +99,9 @@ def run_episode(model, env, discount_factor, render=False):
 
         # Run the policy network and sample action from the returned probability
         prob_up = model(x)
-        action = UP if random.random() < prob_up else DOWN # roll the dice!
 
-        ### TODO: Calculate the log probability of sampling the action that ended up
-        ###       being chosen: log(P(prob_up | action = UP)), log(P(prob_down | action = DOWN))
-        ###       and append to `action_chosen_log_probs`.
+        ### TODO: Sample an action and then calculate the log probability of sampling
+        ###       the action that ended up being chosen. Then append to `action_chosen_log_probs`.
 
         # Step the environment, get new measurements, and updated discounted_reward
         observation, reward, done, info = env.step(action)
@@ -126,7 +124,7 @@ def run_episode(model, env, discount_factor, render=False):
     # PG magic happens right here, multiplying action_chosen_log_prob by future reward.
     # Negate since the optimizer does gradient descent (instead of gradient ascent)
 
-    ### TODO: Calculate the loss that the optimizer will optimize the weights with respect to
+    ### TODO: Calculate the loss that the optimizer will optimize
 
     return loss, rewards.sum()
 
