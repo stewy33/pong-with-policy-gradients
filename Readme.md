@@ -4,9 +4,7 @@ Code for a workshop where you'll learn to train a simple reinforcement learning 
 
 Adapted from [http://karpathy.github.io/2016/05/31/rl/](http://karpathy.github.io/2016/05/31/rl/) and rewritten with PyTorch (CNN policy network incoming!!)
 
-
-
-<img src="gameplay.gif" alt="gameplay recording" style="zoom:150%;" />
+<p align="center"><img src="gameplay.gif" alt="gameplay recording" width="240" height="315" /></p>
 
 Reinforcement learning agent (green paddle) vs simple ball-tracking AI (tan paddle).
 
