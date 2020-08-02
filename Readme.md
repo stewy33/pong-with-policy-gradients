@@ -1,12 +1,20 @@
 # Pong with Policy Gradients 🔨👷 
 
-A workshop to train a simple reinforcement learning agent to play pong using vanilla policy gradients.
+A workshop to train a simple reinforcement learning agent to play pong using vanilla policy gradients 💯 
 
-Adapted from [http://karpathy.github.io/2016/05/31/rl/](http://karpathy.github.io/2016/05/31/rl/) and rewritten with PyTorch.
+Adapted from [http://karpathy.github.io/2016/05/31/rl/](http://karpathy.github.io/2016/05/31/rl/) and rewritten with PyTorch (CNN policy network incoming!!)
 
 
 
 <img src="/Users/stewartslocum/Downloads/pong-rl/gameplay.gif" alt="gameplay recording" style="zoom:150%;" />
+
+
+
+There are five `### TODO:` statements where you'll need to fill in short pieces of code (no longer than a few lines) defining the policy network and calculating the policy gradients.
+
+Solution and trained network in `solution (spoiler alert!)` folder - but try to do it yourself first! You got this 🤠
+
+
 
 What you'll need:
 
@@ -34,9 +42,3 @@ $ tensorboard --logdir tensorboard_logs
 ```
 
 and visit [http://localhost:6006/](http://localhost:6006/).
-
-
-
-There are five `### TODO:` statements where you'll need to fill in short pieces of code (no longer than a few lines) defining the policy network and calculating the policy gradients.
-
-Solution and trained network in `solution (spoiler alert!)` folder - try to do it yourself first!
