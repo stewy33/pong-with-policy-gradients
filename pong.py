@@ -158,8 +158,8 @@ def train(render=False):
     tf_writer.set_as_default()
 
     # Create pong environment (PongDeterministic versions run faster)
-    # Episodes consist of 20 games where a game ending in a win yields +1 reward
-    # and a game ending in a loss give -1 reward.
+    # Episodes consist of a series of games until one player has won 20 times.
+    # A game ending in a win yields +1 reward and a game ending in a loss gives -1 reward.
     #
     # The RL agent (green paddle) plays against a simple AI (tan paddle) that
     # just tries to track the y-coordinate of the ball.
