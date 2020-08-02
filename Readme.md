@@ -6,7 +6,9 @@ Adapted from [http://karpathy.github.io/2016/05/31/rl/](http://karpathy.github.i
 
 
 
-<img src="/Users/stewartslocum/Downloads/pong-rl/gameplay.gif" alt="gameplay recording" style="zoom:150%;" />
+<img src="gameplay.gif" alt="gameplay recording" style="zoom:150%;" />
+
+Reinforcement learning agent (green paddle) vs simple ball-tracking AI (tan paddle).
 
 
 
