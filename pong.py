@@ -138,7 +138,7 @@ def train(render=False):
     # Hyperparameters
     input_size = 80 * 80 # input dimensionality: 80x80 grid
     hidden_size = 200 # number of hidden layer neurons
-    learning_rate = 1e-4
+    learning_rate = 7e-4
     discount_factor = 0.99 # discount factor for reward
 
     batch_size = 4
