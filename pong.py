@@ -5,7 +5,7 @@ Modified from https://gist.github.com/karpathy/a4166c7fe253700972fcbc77e4ea32c5
 """
 
 import argparse
-import datetime as datetime
+import datetime
 import os
 import random
 import time
@@ -32,7 +32,7 @@ def preprocess(image):
 
 
 def calc_discounted_future_rewards(rewards, discount_factor):
-    """
+    r"""
     Calculate the discounted future reward at each timestep.
 
     discounted_future_reward[t] = \sum_{k=1} discount_factor^k * reward[t+k]
@@ -139,22 +139,26 @@ def train(render=False):
     batch_size = 4
     save_every_batches = 5
 
-    # Load model from checkpoint if exists, otherwise, initialize new model
-    if os.path.exists('policy_network.pth'):
-        save_dict = torch.load('policy_network.pth')
+    # Create policy network
+    model = PolicyNetwork(input_size, hidden_size)
 
-        model = save_dict['model']
-        optimizer = save_dict['optimizer']
+    # Load model weights and metadata from checkpoint if exists
+    if os.path.exists('checkpoint.pth'):
+        print('Loading from checkpoint...')
+        save_dict = torch.load('checkpoint.pth')
+
+        model.load_state_dict(save_dict['model_weights'])
         start_time = save_dict['start_time']
         last_batch = save_dict['last_batch']
     else:
-        model = PolicyNetwork(input_size, hidden_size)
-        optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate)
         start_time = datetime.datetime.now().strftime("%H.%M.%S-%m.%d.%Y")
         last_batch = -1
 
+    optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate)
+
     # Set up tensorboard logging
-    tf_writer = tf.summary.create_file_writer(f'tensorboard_logs/{start_time}')
+    tf_writer = tf.summary.create_file_writer(
+        os.path.join('tensorboard_logs', start_time))
     tf_writer.set_as_default()
 
     # Create pong environment (PongDeterministic versions run faster)
@@ -187,19 +191,19 @@ def train(render=False):
         optimizer.step()
 
         # Batch metrics and tensorboard logging
-        print(f'Batch: {batch}, mean loss: {mean_batch_loss:.2f}, mean reward: {mean_batch_reward:.2f}')
+        print(f'Batch: {batch}, mean loss: {mean_batch_loss:.2f}, '
+              f'mean reward: {mean_batch_reward:.2f}')
         tf.summary.scalar('mean loss', mean_batch_loss.detach().item(), step=batch)
         tf.summary.scalar('mean reward', mean_batch_reward.detach().item(), step=batch)
 
         if batch % save_every_batches == 0:
             print('Saving checkpoint...')
             save_dict = {
-                'model': model,
-                'optimizer': optimizer,
+                'model_weights': model.state_dict(),
                 'start_time': start_time,
                 'last_batch': batch
             }
-            torch.save(save_dict, 'policy_network.pth')
+            torch.save(save_dict, 'checkpoint.pth')
 
         batch += 1
 

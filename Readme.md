@@ -18,14 +18,33 @@ It takes a few hours to converge, but you should see some improvement within a f
 
 Solution and trained network in `solution (spoiler alert!)` folder - but try to do it yourself first! You got this 🤠
 
+### Setup
 
-What you'll need:
+Make sure you have a working Python >= 3.5 installation.
 
-- Python >=3.6
-- Pytorch
-- Tensorflow >=2.0
-- OpenAI Gym w/ Atari (`$ pip install "gym[atari]"`)
+Install virtualenv and create a new virtual environment:
 
+On macOS and Linux:
+```bash
+python3 -m pip install --user virtualenv
+python3 -m venv env
+source env/bin/activate
+```
+
+On Windows:
+```bash
+py -m pip install --user virtualenv
+py -m venv env
+.\env\Scripts\activate
+```
+
+P.S. you can leave the virtual environment by entering `deactivate` into the
+terminal when you're done.
+
+Install dependencies:
+```bash
+pip install -r requirements.txt
+```
 
 
 To run it yourself:
