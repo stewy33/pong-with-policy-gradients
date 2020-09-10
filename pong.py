@@ -121,7 +121,7 @@ def run_episode(model, env, discount_factor, render=False):
     discounted_future_rewards = (discounted_future_rewards - discounted_future_rewards.mean()) \
                                      / discounted_future_rewards.std()
 
-    # PG magic happens right here, multiplying action_chosen_log_prob by future reward.
+    # PG magic happens right here, multiplying action_chosen_log_probs by future reward.
     # Negate since the optimizer does gradient descent (instead of gradient ascent)
 
     ### TODO: Calculate the loss that the optimizer will optimize
