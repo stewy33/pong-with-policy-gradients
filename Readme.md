@@ -38,14 +38,15 @@ py -m venv env
 .\env\Scripts\activate
 ```
 
-P.S. you can leave the virtual environment by entering `deactivate` into the
-terminal when you're done.
+(P.S. you can leave the virtual environment by entering `deactivate` into the
+terminal when you're done)
 
 Install dependencies:
 ```bash
 pip install -r requirements.txt
 ```
 
+### Running the Code
 
 To run it yourself:
 
@@ -54,7 +55,6 @@ $ python pong.py [--render]
 ```
 
 where `--render` is an optional flag that renders pong games and slows them down to a watchable speed.
-
 
 
 To view [TensorBoard](https://www.tensorflow.org/tensorboard) visualizations during training, open a separate terminal, run
