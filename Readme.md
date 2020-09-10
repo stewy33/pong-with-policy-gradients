@@ -57,7 +57,7 @@ $ python pong.py [--render]
 where `--render` is an optional flag that renders pong games and slows them down to a watchable speed.
 
 
-To view [TensorBoard](https://www.tensorflow.org/tensorboard) visualizations during training, open a separate terminal, run
+To view [TensorBoard](https://www.tensorflow.org/tensorboard) visualizations during training, open a separate terminal, activate the virtualenv, run
 
 ```bash
 $ tensorboard --logdir tensorboard_logs
