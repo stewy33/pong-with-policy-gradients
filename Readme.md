@@ -50,7 +50,7 @@ Then, just install the requirements
 pip install -r requirements.txt
 ```
 
-Note: on Windows pytorch may fail to install through the above command, and you then need to install manually with:
+Note: on Windows pytorch may fail to install through the above command, and you then need to install manually with
 ```
 pip install torch==1.6.0+cpu torchvision==0.7.0+cpu -f https://download.pytorch.org/whl/torch_stable.html
 ```
