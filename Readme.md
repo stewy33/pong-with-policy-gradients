@@ -2,7 +2,9 @@
 
 Code for an intro to RL workshop. You'll be training a simple RL agent to play pong using vanilla policy gradients 😮💯
 
-Adapted from [http://karpathy.github.io/2016/05/31/rl/](http://karpathy.github.io/2016/05/31/rl/) and rewritten with PyTorch (CNN policy network incoming!!)
+Adapted from [http://karpathy.github.io/2016/05/31/rl/](http://karpathy.github.io/2016/05/31/rl/) and rewritten with PyTorch.
+
+Accompanying slides are [here](https://slides.com/stewyslocum/deck-741e4c).
 
 <p align="center">
     <img src="gameplay.gif" alt="gameplay recording" width="240" height="315" /><br />
@@ -55,6 +57,15 @@ $ python pong.py [--render]
 ```
 
 where `--render` is an optional flag that renders pong games and slows them down to a watchable speed.
+
+
+To test:
+
+```bash
+$ python test.py
+```
+
+(the tests are a helpful guide, but only check the policy network, calculating discounted rewards, and don't guarantee correctness!)
 
 
 To view [TensorBoard](https://www.tensorflow.org/tensorboard) visualizations during training, open a separate terminal, activate the virtualenv, run
