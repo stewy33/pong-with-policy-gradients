@@ -22,7 +22,7 @@ Solution and trained network in `solution (spoiler alert!)` folder - but try to 
 
 ### Setup
 
-Make sure you have a working Python >= 3.5 installation.
+Make sure you have a working Python >= 3.5 installation. Also make sure it is 64-bit. You can see what version you have if you just run `python`'s interactive prompt.
 
 Install virtualenv and create a new virtual environment:
 
@@ -35,8 +35,8 @@ source env/bin/activate
 
 On Windows:
 ```bash
-py -m pip install --user virtualenv
-py -m venv env
+python -m pip install --user virtualenv
+python -m venv env
 .\env\Scripts\activate
 ```
 
@@ -44,9 +44,18 @@ py -m venv env
 terminal when you're done)
 
 Install dependencies:
+
+Then, just install the requirements
 ```bash
 pip install -r requirements.txt
 ```
+
+Note: on Windows pytorch may fail to install through the above command, and you then need to install manually with
+```
+pip install torch==1.6.0+cpu torchvision==0.7.0+cpu -f https://download.pytorch.org/whl/torch_stable.html
+```
+See the [pytorch website](https://pytorch.org/) for more details.
+
 
 ### Running the Code
 
